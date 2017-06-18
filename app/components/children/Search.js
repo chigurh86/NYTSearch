@@ -1,45 +1,69 @@
-// Include React
-var React = require("react");
+import React, {Component} from 'react';
 
-// Creating the Form component
-var Search = React.createClass({render: function() {
-        return (
-            <div className="card-panel">
-                <div className="card-content">
-                    <span className="panel-title text-center">Search</span>
-                    {/*<form onSubmit={this.handleSubmit}>*/}
-                        {/*<div className="form-group">*/}
-                            {/*<h4>*/}
-                                {/*<strong>Search Terms</strong>*/}
-                            {/*</h4>*/}
+class Search extends Component {
+	constructor(){
+		super();
+		this.state = {
+			query: '',
+			startDate: '',
+			endDate: ''
+		}
+		this.handleTopicChange = this.handleTopicChange.bind(this);
+		this.handleStartDateChange = this.handleStartDateChange.bind(this);
+		this.handleEndDateChange = this.handleEndDateChange.bind(this);
+		this.handleSubmit = this.handleSubmit.bind(this);
+	}
 
-                            {/*/!**/}
-                             {/*Note how each of the form elements has an id that matches the state.*/}
-                             {/*This is not necessary but it is convenient.*/}
-                             {/*Also note how each has an onChange event associated with our handleChange event.*/}
-                             {/**!/*/}
-                            {/*<input*/}
-                                {/*value={this.state.term}*/}
-                                {/*type="text"*/}
-                                {/*className="form-control text-center"*/}
-                                {/*id="term"*/}
-                                {/*onChange={this.handleChange}*/}
-                                {/*required*/}
-                            {/*/>*/}
-                            {/*<br />*/}
-                            {/*<button*/}
-                                {/*className="btn btn-primary"*/}
-                                {/*type="submit"*/}
-                            {/*>*/}
-                                {/*Submit*/}
-                            {/*</button>*/}
-                        {/*</div>*/}
-                    {/*</form>*/}
-                </div>
-            </div>
-        );
-    }
-});
+	handleTopicChange(event){
+		this.setState({query: event.target.value});
+	}
 
-// Export the component back for use in other files
+	handleStartDateChange(event){
+		this.setState({startDate: event.target.value});
+	}
+
+	handleEndDateChange(event){
+		this.setState({endDate: event.target.value});
+	}
+
+	handleSubmit() {
+		var newStart = this.state.startDate + '0101';
+		var newEnd = this.state.endDate + '1231';
+		this.props.setStart(newStart);
+		this.props.setEnd(newEnd);
+		this.props.setQuery(this.state.query);
+		this.props.resetRes();
+		this.setState({ query: '', startDate: '', endDate: '' });
+	}
+
+	render(){
+		return (
+
+		  <div className="panel panel-default">
+				<div className="panel-heading">
+			  <h3 className="panel-title text-center">Search</h3>
+				</div>
+				<div className="panel-body">
+		      <form onSubmit={(event) => {event.preventDefault(); this.handleSubmit();}}>
+		  	    <div className="form-group">
+		          <label htmlFor="topic">Topic</label>
+		          <input value={this.state.query} onChange={this.handleTopicChange} className="form-control" id="topic" placeholder="example: Trump" />
+		        </div>
+		        <div className="form-group">
+		          <label htmlFor="start-year">Start Year</label>
+		          <input value={this.state.startDate} onChange={this.handleStartDateChange} className="form-control" id="start-year" placeholder="YYYY" />
+		        </div>
+		        <div className="form-group">
+		          <label htmlFor="end-year">End Year</label>
+		          <input value={this.state.endDate} onChange={this.handleEndDateChange} className="form-control" id="end-year" placeholder="YYYY" />
+		        </div>
+		       	<button type="submit" className="btn btn-success">Submit</button>
+			      </form>
+		    </div>
+		  </div>
+
+		)
+	}
+}
+
 module.exports = Search;

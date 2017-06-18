@@ -1,76 +1,54 @@
-var React = require("react");
+import React, {Component} from 'react';
+import Search from './children/search.js';
+import Results from './children/results.js';
+import Saved from './children/saved.js';
+import helpers from './utils/helpers.js';
 
-var Search = require("./children/Search"),
-    Results = require("./children/Results"),
-    Saved = require("./children/Saved"),
-    helpers = require("./utils/helpers");
+class Main extends Component {
+	constructor(props){
+		super(props);
+		this.state = {query: '', startDate: '', endDate: '', res: null};
 
-var Main = React.createClass({
-  getInitialState: function() {
-    return {searchTerm: "", results: "", history: []};
-  },
-  componentDidMount: function (){
-    helpers.getHistory().then(function(response){
-      console.log(response);
-      if(response !== this.state.history){
-        console.log("History", response.data);
-        this.setState({ history: response.data});
-      }
-    }.bind(this));
-  },
-  componentDidUpdate: function(){
-    helpers.runQuery(this.state.searchTerm).then(function(data) {
-      if(data !== this.state.results) {
-        console.log("Address", data);
-        this.setState({ results: data });
-        helpers.postHistory(this.state.searchTerm).then(function(){
-          console.log("Updated!");
-          helpers.getHistory().then(function(response) {
-                        console.log("Current History", response.data);
-                        console.log("History", response.data);
-                        this.setState({ history: response.data });
-                    }.bind(this));
-        }.bind(this));
-      }
-    }.bind(this));
-  },
-  setTerm: function(term){
-    this.setState({ searchTerm: term});
-  },
-  render: function(){
-    return(
-            <div className="container">
-                <div className="row">
-                    <div className="card-panel">
-                        <h2 className="center-align">Article Scrubber</h2>
-                        <p className="center-align">
-                            <em>Search for articles of you would like to see!</em>
-                        </p>
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col s12">
-                        <Search
-                            // setTerm={this.setTerm}
-                        />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col s12">
-                        <Results
-                            // results={this.state.results}
-                        />
-                    </div>
-                </div>
-                <div className="row">
-                    <div className="col s12">
-                        <Saved
-                            // saved={this.state.saved}
-                        />
-                    </div>
-                </div>
-            </div>
-        );
-      }
-});
+		this.setQuery = this.setQuery.bind(this);
+		this.setStart = this.setStart.bind(this);
+		this.setEnd = this.setEnd.bind(this);
+		this.resetRes = this.resetRes.bind(this);
+	}
+
+	componentDidUpdate() {
+		if(!this.state.res){
+			helpers.fetchData(this.state.query, this.state.startDate, this.state.endDate).then(function(data){
+				this.setState({res: data});
+			}.bind(this));
+		}
+	}
+
+	setQuery(query){
+		this.setState({ query: query });
+	}
+
+	setStart(start){
+		this.setState({ startDate: start });
+	}
+
+	setEnd(end){
+		this.setState({ endDate: end });
+	}
+
+	resetRes(){
+		this.setState({res: null});
+	}
+
+	render() {
+		return (
+			<div className="container">
+			  <Search resetRes={this.resetRes} setQuery={this.setQuery} setStart={this.setStart} setEnd={this.setEnd} />
+			  <Results res={this.state.res}/>
+			  <Saved />
+			</div>
+		)
+	}
+
+}
+
 module.exports = Main;

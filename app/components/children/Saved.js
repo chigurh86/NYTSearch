@@ -1,14 +1,22 @@
-var React = require('react');
+import React, {Component} from 'react';
 
-var Saved = React.createClass({
-    render: function() {
-        return (
-            <div className="card-panel">
-                <div className="card-content">
-                    <span className="panel-title text-center">Saved</span>
-                </div>
-            </div>
-        );
-    }
-});
+class Saved extends Component	{
+	constructor(){
+		super();
+	}
+
+	render(){
+		return (
+			<div className="panel panel-default">
+  			  <div className="panel-heading">
+    			<h3 className="panel-title text-center">Saved</h3>
+  			  </div>
+  			  <div className="panel-body">
+    				Saved articles go here
+  			  </div>
+			</div>
+		)
+	}
+}
+
 module.exports = Saved;

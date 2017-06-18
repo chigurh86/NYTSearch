@@ -1,47 +1,54 @@
-// dependencies
-var express = require("express"),
-  bodyParser = require("body-parser"),
-  logger = require("morgan"),
-  mongoose = require("mongoose");
+// Dependencies
+var express = require("express");
+var bodyParser = require("body-parser");
+var logger = require("morgan");
+var mongoose = require("mongoose");
 
-// require Article model
-
+//requiring models
 var Article = require("./models/Article");
 
-// build express
+//initialize express app
 var app = express();
-const PORT = process.env.PORT || 3005;
+//declare port
+var port = process.env.PORT || 8082;
 
-// bodyparser
+//Use Morgan for Logging
 app.use(logger("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.text());
 app.use(bodyParser.json({ type: "application/vnd.api+json" }));
 
-// for static content
-app.use(express.static("./public"));
+// Serve static content
+app.use(express.static(process.cwd() + "/public"));
 
-// mongodb config
-
+// -------------------------------------------------
+// MongoDB Configuration
 mongoose.connect("mongodb://localhost/nytreact");
 var db = mongoose.connection;
 
-db.on("error", function(err){
-  console.log("Mongoose Error: ", err);
+// Show any mongoose errors
+db.on("error", function(err) {
+    console.log("Mongoose Error: ", err);
 });
 
-db.once("open", function(){
-  console.log("Mongoose connection succesful.");
+// Once logged in to the db through mongoose, log a success message
+db.once("open", function() {
+    console.log("Mongoose connection successful.");
 });
 
-// main route
+// -------------------------------------------------
 
-app.get("/", function(req, res){
-  res.sendFile(_dirname + "/public/index.html");
-});
+// Set up an Express Router
+var router = express.Router();
 
-// listener
-app.listen(PORT, function(){
-  console.log("App listening on PORT: " + PORT);
+// Require routes file pass router object
+require("./config/expressRoutes")(router);
+
+app.use(router);
+
+// -------------------------------------------------
+
+app.listen(port, function() {
+  console.log("App running on port " + port + "!");
 });
